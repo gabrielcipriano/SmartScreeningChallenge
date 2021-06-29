@@ -1,5 +1,5 @@
 const fs = require('fs').promises;
-const ValidJsonFileName = require('../utils')
+const {ValidJsonFileName} = require('../utils')
 
 const path = "./json_resources/";
 
