@@ -7,4 +7,4 @@ ValidJsonFileName = (fileName) => {
   }
 }
 
-module.exports = ValidJsonFileName;
+module.exports = {ValidJsonFileName};
