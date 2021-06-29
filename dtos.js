@@ -5,4 +5,11 @@ class ExitListItem {
   }
 }
 
-module.exports = {ExitListItem};
+class MeanExit {
+  constructor(mean, median){
+    this.mean = mean;
+    this.median = median;
+  }
+}
+
+module.exports = {ExitListItem, MeanExit};
