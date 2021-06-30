@@ -1,4 +1,6 @@
-const fs = require('fs').promises;
+const { SSL_OP_TLS_D5_BUG } = require('constants');
+const fs = require('fs');
+const fsp = fs.promises;
 const dto = require('../dtos')
 const {ValidJsonFileName, median, mean} = require('../utils')
 
@@ -10,7 +12,7 @@ getByFilename = async (req, res) => {
 
   try { // Busca o arquivo no disco
     ValidJsonFileName(fileName);
-    data = await fs.readFile(path + fileName);
+    data = await fsp.readFile(path + fileName);
   } catch (err) {
     console.error('Something went wrong!', err);
     return res.status(400).json({'error_message': err.message, 'err': err});
@@ -27,7 +29,7 @@ getMeanByFilename = async (req, res) => {
 
   try { // Busca o arquivo no disco
     ValidJsonFileName(fileName);
-    data = await fs.readFile(path + fileName);
+    data = await fsp.readFile(path + fileName);
   } catch (err) {
     console.error('Something went wrong!', err);
     return res.status(400).json({'error_message': err.message, 'err': err});
@@ -43,7 +45,30 @@ getMeanByFilename = async (req, res) => {
 }
 
 getAllMean = async (req, res) => {
-  //TODO: implementar
+  try{
+    fileNames = await fsp.readdir(path);
+  } catch(err){ // Internal Server Error
+    console.log(err)
+    return res.status(500).json({'error_message': err.message, 'err': err});
+  }
+  
+  activitiesStatus = [];
+
+  for (let i = 0; i < fileNames.length; i++) {
+    try { // Busca o arquivo no disco
+      data = await fsp.readFile(path + fileNames[i]);
+    } catch (err) {
+      console.error('Something went wrong!', err);
+      return res.status(400).json({'error_message': err.message, 'err': err});
+    }
+    data = JSON.parse(data).exits.map(item => item.activity);
+
+    activitiesStatus.push({
+      [fileNames[i]] : new dto.MeanExit(mean(data), median(data))
+    });
+  }
+
+  return res.status(200).json(activitiesStatus);
 }
 
 module.exports = {getByFilename, getMeanByFilename, getAllMean};
